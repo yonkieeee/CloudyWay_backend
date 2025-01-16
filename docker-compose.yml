@@ -1,0 +1,13 @@
+services:
+  auth_api:
+    container_name: "auth_api"
+    build:
+      context: .
+      dockerfile: authUser/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      FIREBASE_KEY: ${FIREBASE_KEY}
+      FIREBASE_URL: ${FIREBASE_URL}
+    env_file:
+      - .env

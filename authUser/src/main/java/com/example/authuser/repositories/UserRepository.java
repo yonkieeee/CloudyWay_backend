@@ -1,6 +1,6 @@
 package com.example.authuser.repositories;
 
-import com.example.cloudywaybackend.models.User;
+import com.example.authuser.models.User;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import org.springframework.beans.factory.annotation.Autowired;

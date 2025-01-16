@@ -1,7 +1,7 @@
 package com.example.authuser.controllers;
 
-import com.example.cloudywaybackend.models.User;
-import com.example.cloudywaybackend.repositories.UserRepository;
+import com.example.authuser.models.User;
+import com.example.authuser.repositories.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

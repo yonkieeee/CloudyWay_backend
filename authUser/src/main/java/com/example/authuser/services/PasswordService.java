@@ -1,7 +1,7 @@
 package com.example.authuser.services;
 
 
-import com.example.cloudywaybackend.repositories.UserRepository;
+import com.example.authuser.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

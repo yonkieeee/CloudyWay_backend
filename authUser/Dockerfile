@@ -1,27 +1,9 @@
-FROM openjdk:21-slim AS build
+FROM eclipse-temurin:21-jdk-alpine
 
-ARG FIREBASE_KEY
-ARG FIREBASE_URL
+ARG JAR_FILE=./target/*.jar
 
-ENV FIREBASE_KEY=${FIREBASE_KEY}
-ENV FIREBASE_URL=${FIREBASE_URL}
+COPY ./target/cloudywaybackend-0.0.1.jar app.jar
 
-RUN apt-get update && apt-get install -y maven
+EXPOSE 8080
 
-# Copy the necessary files, including the pom.xml
-COPY authUser/pom.xml /app/authUser/pom.xml
-COPY authUser/ /app/authUser/
-
-# Set the working directory to the folder where pom.xml is located
-WORKDIR /app/authUser
-
-# Run Maven to build the project
-RUN mvn clean package -DFIREBASE_KEY=${FIREBASE_KEY} -DFIREBASE_URL=${FIREBASE_URL}
-
-FROM eclipse-temurin:21-jre-jammy
-
-WORKDIR /app
-
-COPY --from=build /app/authUser/target/*.jar app.jar
-
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "/app.jar"]

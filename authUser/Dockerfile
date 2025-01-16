@@ -8,7 +8,8 @@ ENV FIREBASE_URL=${FIREBASE_URL}
 
 RUN apt-get update && apt-get install -y maven
 
-COPY . .
+COPY authUser/pom.xml /app/pom.xml
+COPY authUser/ /app/
 
 RUN mvn clean package -DFIREBASE_KEY=${FIREBASE_KEY} -DFIREBASE_URL=${FIREBASE_URL}
 

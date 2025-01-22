@@ -42,6 +42,23 @@ public class UserRepository{
         return Optional.empty();
     }
 
+    public User getUserBy(String field, String value) throws ExecutionException, InterruptedException {
+
+        Query query = usersCollection.whereEqualTo(field, value);
+        ApiFuture<QuerySnapshot> future = query.get();
+
+
+        QuerySnapshot querySnapshot = future.get();
+
+        if (querySnapshot != null && !querySnapshot.isEmpty()) {
+
+            DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+            return document.toObject(User.class);
+        }
+
+        return null;
+    }
+
     public void deleteUser(String uid) throws ExecutionException, InterruptedException {
         ApiFuture<WriteResult> future = usersCollection.document(uid).delete();
         future.get();

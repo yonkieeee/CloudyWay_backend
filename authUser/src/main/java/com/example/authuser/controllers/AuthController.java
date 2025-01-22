@@ -9,12 +9,12 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/auth")
 @CrossOrigin(origins = "*")
-public class UserController {
+public class AuthController {
     private final UserRepository userRepository;
 
-    public UserController(UserRepository userRepository) {
+    public AuthController(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -25,7 +25,7 @@ public class UserController {
                 return ResponseEntity.badRequest().body("User already exists");
             }
 
-            if (userRepository.usernameExists(user.getUsername())){
+            if (userRepository.getUserBy("username", user.getUsername()) != null){
                 return ResponseEntity.badRequest().body("Username already exists");
             }
 
@@ -51,16 +51,16 @@ public class UserController {
         return null;
     }
 
-    @PutMapping
+    @PutMapping("/change-user")
     public ResponseEntity<?> updateUser(@RequestParam(value="uid") String uid
             , @RequestBody Map<String, Object> update) throws ExecutionException, InterruptedException {
         if (!userRepository.existById(uid)){
             return ResponseEntity.badRequest().body("User doesn`t exist");
         }
         userRepository.changeUser(uid, update);
-            return ResponseEntity.ok("User updated");
-
+        return ResponseEntity.ok("User updated");
     }
+
 
     @DeleteMapping
     public ResponseEntity<?> deleteUser(@RequestParam(value="uid") String uid) throws ExecutionException, InterruptedException {

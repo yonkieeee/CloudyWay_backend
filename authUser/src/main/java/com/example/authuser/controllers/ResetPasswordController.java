@@ -24,18 +24,12 @@ public class ResetPasswordController {
         this.userRepository = userRepository;
         this.forgetPasswordService = forgetPasswordService;
     }
+
     @PostMapping("/send-otp")
     public ResponseEntity<?> sendOTP(@RequestBody Map<String, String> body)
             throws ExecutionException, InterruptedException {
-
-        User user;
-        String identifier = body.get("identifier");
-
-        if(identifier.contains("@")){
-            user = userRepository.getUserBy("email", identifier);
-        } else {
-            user = userRepository.getUserBy("username", identifier);
-        }
+        String identifier = body.get("identifier").contains("@") ? "email" : "username";
+        User user = userRepository.getUserBy(identifier, body.get("identifier"));
 
         if(user != null){
             try {
@@ -51,17 +45,12 @@ public class ResetPasswordController {
     @PostMapping("/validate-otp")
     public ResponseEntity<?> validateOTP(@RequestBody Map<String, String> body)
             throws ExecutionException, InterruptedException{
+        String identifier = body.get("identifier").contains("@") ? "email" : "username";
+        User user = userRepository.getUserBy(identifier, body.get("identifier"));
 
-        User user;
-        String identifier = body.get("identifier");
         String otp = body.get("otp");
 
-        if(identifier.contains("@")){
-            user = userRepository.getUserBy("email", identifier);
-        } else {
-            user = userRepository.getUserBy("username", identifier);
-        }
-        if(user == null) return ResponseEntity.badRequest().body("User not finded");
+        if(user == null) return ResponseEntity.badRequest().body("User not found");
 
         if(forgetPasswordService.validateOTP(user.getEmail(), otp)){
             return ResponseEntity.ok().body("OTP verified");
@@ -73,22 +62,13 @@ public class ResetPasswordController {
     @PutMapping
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, Object> body)
             throws ExecutionException, InterruptedException {
-        User user;
-        String identifier = body.get("identifier").toString();
-        String password = body.get("password").toString();
-
-        if(identifier.contains("@")){
-            user = userRepository.getUserBy("email", identifier);
-        } else {
-            user = userRepository.getUserBy("username", identifier);
-        }
+        String identifier = body.get("identifier").toString().contains("@") ? "email" : "username";
+        User user = userRepository.getUserBy(identifier, body.get("identifier").toString());
 
         if(user == null) return ResponseEntity.badRequest().body("User not exists");
 
-        body.put("password",
-                BCrypt.hashpw((String) body.get("password"), BCrypt.gensalt()));
         try {
-            userRepository.changeUser(user.getUid(), body);
+            forgetPasswordService.changePassword(user, body);
             return ResponseEntity.ok().body("Password changed successfully");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

@@ -2,12 +2,17 @@ package com.example.authuser.services;
 
 
 import com.example.authuser.dto.MailBody;
+import com.example.authuser.models.User;
 import com.example.authuser.repositories.UserRepository;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.UnifiedJedis;
 
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -46,15 +51,31 @@ public class ForgetPasswordService {
     }
 
     public Boolean validateOTP(String email, String otp) {
-        String sentOtp = jedis.get(email);
+        try {
+            String sendOTP = jedis.get(email);
 
-        if (Objects.equals(sentOtp, otp)) {
-            jedis.del(email);
-            return true;
+            if (Objects.equals(sendOTP, otp)) {
+                jedis.del(email);
+                return true;
+            }
+            return false;
+        }catch (Exception e){
+            return false;
         }
-        else return false;
     }
 
+    public void changePassword(User user, Map<String, Object> body) {
+        try {
+            UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(user.getUid())
+                    .setPassword(body.get("password").toString());
+            FirebaseAuth.getInstance().updateUser(request);
 
-
+            body.put("password",
+                    BCrypt.hashpw((String) body.get("password"), BCrypt.gensalt()));
+            body.remove("identifier");
+            userRepository.changeUser(user.getUid(), body);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }

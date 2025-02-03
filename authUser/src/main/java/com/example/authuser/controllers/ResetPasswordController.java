@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/reset-password")
-@CrossOrigin("*")
+@CrossOrigin(origins = "*")
 public class ResetPasswordController {
     private final ForgetPasswordService forgetPasswordService;
     private final UserRepository userRepository;

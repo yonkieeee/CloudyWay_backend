@@ -13,6 +13,7 @@ import java.net.URISyntaxException;
 @Configuration
 public class RabbitMQConfig {
 
+
     private final String rabbitMQURL;
 
     @Autowired

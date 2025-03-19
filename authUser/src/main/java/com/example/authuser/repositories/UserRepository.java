@@ -65,10 +65,4 @@ public class UserRepository{
 
         return document.exists();
     }
-
-    public void changeUser(String uid, Map<String, Object> updates)
-            throws ExecutionException, InterruptedException {
-        ApiFuture<WriteResult> future = usersCollection.document(uid).update(updates);
-        future.get();
-    }
 }

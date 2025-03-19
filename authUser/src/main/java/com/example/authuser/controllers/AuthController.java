@@ -5,6 +5,7 @@ import com.example.authuser.repositories.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -39,9 +40,6 @@ public class AuthController {
     @GetMapping
     public ResponseEntity<?> getAllUsers(@RequestParam(value="uid", required = false) String uid) {
         try{
-            if (uid == null) {
-                return ResponseEntity.ok(userRepository.getAllUsers());
-            }
             if (userRepository.existById(uid)) {
                 return ResponseEntity.ok(userRepository.getUser(uid));
             }
@@ -59,16 +57,5 @@ public class AuthController {
         }
         userRepository.changeUser(uid, update);
         return ResponseEntity.ok("User updated");
-    }
-
-
-    @DeleteMapping
-    public ResponseEntity<?> deleteUser(@RequestParam(value="uid") String uid) throws ExecutionException, InterruptedException {
-        if(!userRepository.existById(uid)){
-            return ResponseEntity.badRequest().body("User doesn`t exist");
-        }
-
-        userRepository.deleteUser(uid);
-        return ResponseEntity.ok("User deleted");
     }
 }

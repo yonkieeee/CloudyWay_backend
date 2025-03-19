@@ -23,5 +23,5 @@
 hs_err_pid*
 replay_pid*
 
-authUser/.env
+authUser/src/main/resources/.env
 Here_API_Service/src/main/resources/.env

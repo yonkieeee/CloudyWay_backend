@@ -25,9 +25,6 @@ public class UserRepository{
 
     public void saveUser(User user)
             throws ExecutionException, InterruptedException {
-        String hashPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
-        user.setPassword(hashPassword);
-
         ApiFuture<WriteResult> future = usersCollection.document(user.getUid()).set(user);
         future.get();
     }
@@ -60,12 +57,6 @@ public class UserRepository{
         return null;
     }
 
-    public void deleteUser(String uid)
-            throws ExecutionException, InterruptedException {
-        ApiFuture<WriteResult> future = usersCollection.document(uid).delete();
-        future.get();
-    }
-
     public Boolean existById(String uid)
             throws ExecutionException, InterruptedException {
         DocumentReference docRef = usersCollection.document(uid);
@@ -73,21 +64,6 @@ public class UserRepository{
         DocumentSnapshot document = future.get();
 
         return document.exists();
-    }
-
-    public List<User> getAllUsers()
-            throws ExecutionException, InterruptedException {
-        ApiFuture<QuerySnapshot> future = usersCollection.get();
-        QuerySnapshot query = future.get();
-
-        if(query.isEmpty()){
-            return Collections.emptyList();
-        }
-        List<QueryDocumentSnapshot> documents = query.getDocuments();
-
-        return documents.stream()
-                .map(doc->doc.toObject(User.class))
-                .toList();
     }
 
     public void changeUser(String uid, Map<String, Object> updates)

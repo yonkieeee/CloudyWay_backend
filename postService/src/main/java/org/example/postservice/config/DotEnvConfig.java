@@ -7,17 +7,24 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DotEnvConfig {
 
-    private Dotenv dotenv;
+    private Dotenv dotenv = Dotenv.configure()
+            .load();
 
     @PostConstruct
     public void init() {
-        dotenv = Dotenv.configure()
-                .load();
-    }
+        String accessKey = dotenv.get("S3_ACCESS_KEY");
+        String secretKey = dotenv.get("S3_SECRET_KEY");
 
-    @PostConstruct
-    public void setProperties() {
-        System.setProperty("S3_ACCESS_KEY", dotenv.get("S3_ACCESS_KEY"));
-        System.setProperty("S3_SECRET_KEY", dotenv.get("S3_SECRET_KEY"));
+        if (accessKey != null) {
+            System.setProperty("S3_ACCESS_KEY", accessKey);
+        } else {
+            throw new IllegalArgumentException("S3_ACCESS_KEY not found in .env file");
+        }
+
+        if (secretKey != null) {
+            System.setProperty("S3_SECRET_KEY", secretKey);
+        } else {
+            throw new IllegalArgumentException("S3_SECRET_KEY not found in .env file");
+        }
     }
 }

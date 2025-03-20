@@ -1,9 +1,11 @@
-FROM eclipse-temurin:21-jdk-alpine
+FROM openjdk:21-slim as build
 
-ARG JAR_FILE=./target/*.jar
+RUN apt-get update && apt-get install -y maven
 
-COPY authUser/target/*.jar app.jar
+COPY . .
 
-EXPOSE 8080
+FROM eclipse-temurin:21-jre-jammy
 
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+COPY --from=build /target/*.jar app.jar
+
+ENTRYPOINT["java", "-jar", "app.jar"]

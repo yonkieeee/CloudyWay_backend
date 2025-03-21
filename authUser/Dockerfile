@@ -2,6 +2,10 @@ FROM openjdk:21-slim as build
 
 RUN apt-get update && apt-get install -y maven
 
+COPY ./authUser/pom.xml ./authUser/
+
+COPY ./authUser/src ./authUser/src
+
 COPY . .
 
 RUN mvn clean package -DskipTests

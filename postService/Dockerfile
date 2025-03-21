@@ -2,6 +2,10 @@ FROM openjdk:21-slim as build
 
 RUN apt-get update && apt-get install -y maven
 
+COPY ./postService/pom.xml ./postService/
+
+COPY ./postService/src ./postService/src
+
 COPY . .
 
 RUN mvn clean package -DskipTests

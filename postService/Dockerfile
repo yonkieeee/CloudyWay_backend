@@ -12,6 +12,6 @@ RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-jammy
 
-COPY --from=build /target/*.jar app.jar
+COPY --from=build /postService/target/*.jar app.jar
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

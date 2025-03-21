@@ -73,7 +73,6 @@ public class ForgetPasswordService {
             body.put("password",
                     BCrypt.hashpw((String) body.get("password"), BCrypt.gensalt()));
             body.remove("identifier");
-            userRepository.changeUser(user.getUid(), body);
         }catch (Exception e){
             e.printStackTrace();
         }

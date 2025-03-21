@@ -37,11 +37,8 @@ public class AuthController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllUsers(@RequestParam(value="uid", required = false) String uid) {
+    public ResponseEntity<?> getUserById(@RequestParam(value="uid") String uid) {
         try{
-            if (uid == null) {
-                return ResponseEntity.ok(userRepository.getAllUsers());
-            }
             if (userRepository.existById(uid)) {
                 return ResponseEntity.ok(userRepository.getUser(uid));
             }
@@ -49,26 +46,5 @@ public class AuthController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
         return null;
-    }
-
-    @PutMapping("/change-user")
-    public ResponseEntity<?> updateUser(@RequestParam(value="uid") String uid
-            , @RequestBody Map<String, Object> update) throws ExecutionException, InterruptedException {
-        if (!userRepository.existById(uid)){
-            return ResponseEntity.badRequest().body("User doesn`t exist");
-        }
-        userRepository.changeUser(uid, update);
-        return ResponseEntity.ok("User updated");
-    }
-
-
-    @DeleteMapping
-    public ResponseEntity<?> deleteUser(@RequestParam(value="uid") String uid) throws ExecutionException, InterruptedException {
-        if(!userRepository.existById(uid)){
-            return ResponseEntity.badRequest().body("User doesn`t exist");
-        }
-
-        userRepository.deleteUser(uid);
-        return ResponseEntity.ok("User deleted");
     }
 }

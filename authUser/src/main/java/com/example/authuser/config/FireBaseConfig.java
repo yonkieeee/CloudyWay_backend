@@ -34,7 +34,6 @@ public class FireBaseConfig {
 
     @Bean
     public Firestore firestore(FirebaseApp firebaseApp) {
-
         return FirestoreClient.getFirestore(firebaseApp);
     }
 }

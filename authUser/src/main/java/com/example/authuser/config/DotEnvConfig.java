@@ -7,13 +7,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DotEnvConfig {
 
-    private Dotenv dotenv;
-
-    @PostConstruct
-    public void init() {
-        dotenv = Dotenv.configure()
-                .load();
-    }
+    private Dotenv dotenv = Dotenv.configure()
+            .load();;
 
     @PostConstruct
     public void setProperties() {

@@ -6,8 +6,6 @@ COPY ./authUser/pom.xml ./authUser/
 
 COPY ./authUser/src ./authUser/src
 
-COPY . .
-
 RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-jammy

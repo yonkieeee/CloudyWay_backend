@@ -6,8 +6,6 @@ COPY ./postService/pom.xml ./postService/
 
 COPY ./postService/src ./postService/src
 
-COPY . .
-
 RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-jammy

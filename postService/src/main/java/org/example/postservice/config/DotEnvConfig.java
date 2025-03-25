@@ -12,19 +12,9 @@ public class DotEnvConfig {
 
     @PostConstruct
     public void init() {
-        String accessKey = dotenv.get("S3_ACCESS_KEY");
-        String secretKey = dotenv.get("S3_SECRET_KEY");
-
-        if (accessKey != null) {
-            System.setProperty("S3_ACCESS_KEY", accessKey);
-        } else {
-            throw new IllegalArgumentException("S3_ACCESS_KEY not found in .env file");
-        }
-
-        if (secretKey != null) {
-            System.setProperty("S3_SECRET_KEY", secretKey);
-        } else {
-            throw new IllegalArgumentException("S3_SECRET_KEY not found in .env file");
-        }
+        System.setProperty("FIREBASE_CREDENTIALS", dotenv.get("FIREBASE_CREDENTIALS"));
+        System.setProperty("FIREBASE_URL", dotenv.get("FIREBASE_URL"));
+        System.setProperty("S3_ACCESS_KEY", dotenv.get("S3_ACCESS_KEY"));
+        System.setProperty("S3_SECRET_KEY", dotenv.get("S3_SECRET_KEY"));
     }
 }

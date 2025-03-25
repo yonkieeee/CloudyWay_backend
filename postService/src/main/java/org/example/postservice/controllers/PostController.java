@@ -48,8 +48,12 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllPosts(@RequestParam("uid") String uid) {
+    public ResponseEntity<?> getAllPosts(@RequestParam(value = "uid") String uid,
+                                         @RequestParam(value = "post-id", required = false) String postId) {
         try{
+            if (postId != null) {
+                return ResponseEntity.ok(postRepo.getPost(uid, postId));
+            }
             return ResponseEntity.ok(postRepo.getPosts(uid));
         } catch (Exception e) {
             throw new RuntimeException(e);

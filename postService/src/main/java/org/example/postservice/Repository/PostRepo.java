@@ -8,8 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Repository
 public class PostRepo {
@@ -57,5 +61,23 @@ public class PostRepo {
             }
         }
         return null;
+    }
+
+    public List<Post> getPost(String uid, String postId) throws ExecutionException, InterruptedException {
+        DocumentReference docRef = postsCollection.document(uid);
+        ApiFuture<DocumentSnapshot> future = docRef.get();
+        DocumentSnapshot document = future.get();
+
+        if (!document.exists())
+            return Collections.emptyList();
+
+        UserPosts userPosts = document.toObject(UserPosts.class);
+
+        if (userPosts == null || userPosts.getPosts() == null)
+            return Collections.emptyList();
+
+        return userPosts.getPosts().stream()
+                .filter(post -> Objects.equals(post.getPostID(), postId))
+                .collect(Collectors.toList());
     }
 }

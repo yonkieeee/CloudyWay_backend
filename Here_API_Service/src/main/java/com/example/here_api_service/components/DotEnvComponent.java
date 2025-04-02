@@ -37,4 +37,8 @@ public class DotEnvComponent {
     public String getRabbitMQURL(){
         return dotenv.get("RABBITMQ_URL");
     }
+
+    public String getUkraineLatAndLng(){
+        return dotenv.get("UKRAINE_LAT_AND_LNG");
+    }
 }

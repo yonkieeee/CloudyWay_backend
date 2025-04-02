@@ -27,7 +27,7 @@ public class HereApiService {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public String getLocationData(Double latitude, Double longitude, String query) {
+    public ResponseEntity<String> getLocationData(Double latitude, Double longitude, String query) {
         try {
             String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
             String formattedLatLon = String.format(Locale.ENGLISH, "%.6f,%.6f", latitude, longitude);
@@ -36,26 +36,53 @@ public class HereApiService {
                     dotEnvComponent.getDiscoverBaseUrl(), formattedLatLon, encodedQuery, HERE_API_KEY);
 
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-            return response.getBody();
+            return response;
         } catch (Exception e) {
             e.printStackTrace();
-            return "Error retrieving location data";
+            return ResponseEntity.internalServerError().body("Error getting location data");
         }
     }
 
-    public String geocodeLocationData(String houseNumber, String street, String city, String state, String postalCode, String country) {
+    public ResponseEntity<String> discoverPlace(String placeName) {
         try {
-            String encodedStreet = URLEncoder.encode(street, StandardCharsets.UTF_8);
-            String encodedCountry = URLEncoder.encode(country, StandardCharsets.UTF_8);
+            String encodedQuery = URLEncoder.encode(placeName, StandardCharsets.UTF_8);
 
-            String url = String.format("%s?qq=houseNumber=%s;street=%s;city=%s;state=%s;postalCode=%s;country=%s&apiKey=%s",
-                    dotEnvComponent.getGeocodeBaseUrl(), houseNumber, encodedStreet, city, state, postalCode, encodedCountry, HERE_API_KEY);
+            String url = String.format("%s?q=%s&in=bbox:%s&apiKey=%s",
+                    dotEnvComponent.getDiscoverBaseUrl(), encodedQuery, dotEnvComponent.getUkraineLatAndLng(), HERE_API_KEY);
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-            rabbitTemplate.convertAndSend("Geocode", "", response.getBody());
-            return response.getBody();
+            return response;
         } catch (Exception e) {
             e.printStackTrace();
-            return "Error retrieving geocode data";
+            return ResponseEntity.internalServerError().body("Error retrieving place data");
+        }
+    }
+
+    public ResponseEntity<String> geocodeLocationData(String houseNumber, String street, String city, String state, String postalCode, String country) {
+        try {
+            String url = String.format("%s?qq=houseNumber=%s;street=%s;city=%s;state=%s;postalCode=%s;country=%s&apiKey=%s",
+                    dotEnvComponent.getGeocodeBaseUrl(), houseNumber, street, city, state, postalCode, country, HERE_API_KEY);
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            rabbitTemplate.convertAndSend("Geocode", "", response.getBody());
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Error getting location data");
+        }
+    }
+
+    public ResponseEntity<String> geocodePlace(String placeName, String houseNumber, String street, String city) {
+        try {
+            String query = String.format("%s, %s %s, %s", placeName, houseNumber, street, city);
+
+            String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
+
+            String url = String.format("%s?q=%s&apiKey=%s",
+                    dotEnvComponent.getGeocodeBaseUrl(), encodedQuery, HERE_API_KEY);
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Error getting location data");
         }
     }
 }

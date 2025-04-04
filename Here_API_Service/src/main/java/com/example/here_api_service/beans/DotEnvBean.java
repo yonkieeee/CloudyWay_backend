@@ -9,9 +9,6 @@ public class DotEnvBean {
 
     @Bean
     public Dotenv dotenv(){
-        return Dotenv.configure()
-                .directory("./") // Відповідно налаштуйте шлях
-                .filename(".env")
-                .load();
+        return Dotenv.configure().load();
     }
 }

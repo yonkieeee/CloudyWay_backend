@@ -57,4 +57,14 @@ public class PlaceController {
         }
     }
 
+    @PostMapping("/addPlace")
+    public ResponseEntity<?> addPlace(@RequestBody PlaceModel place) {
+        try {
+            placeService.save(place);
+            return ResponseEntity.ok("Place added successfully");
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

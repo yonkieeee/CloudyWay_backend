@@ -24,4 +24,8 @@ public class PlaceService {
     public List<PlaceModel> getAllPlacesByCity(String city) {
         return placeRepository.findAllByCity(city);
     }
+
+    public void save(PlaceModel place) {
+        placeRepository.save(place);
+    }
 }

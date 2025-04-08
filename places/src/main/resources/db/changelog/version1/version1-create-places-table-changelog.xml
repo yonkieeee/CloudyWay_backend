@@ -1,0 +1,49 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="version1-create-places-table" author="Yura">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="places"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="places">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="here_api_id" type="varchar(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="placeName" type="varchar(255)">
+                <constraints unique="false" nullable="false"/>
+            </column>
+            <column name="city" type="varchar(255)">
+                <constraints unique="false" nullable="false"/>
+            </column>
+            <column name="county" type="varchar(255)">
+                <constraints unique="false" nullable="false"/>
+            </column>
+            <column name="street" type="varchar(255)">
+                <constraints unique="false" nullable="false"/>
+            </column>
+            <column name="houseNumber" type="varchar(255)">
+                <constraints unique="false" nullable="true"/>
+            </column>
+            <column name="coordinates" type="jsonb">
+                <constraints unique="false" nullable="false"/>
+            </column>
+            <column name="description" type="text">
+                <constraints unique="true" nullable="true"/>
+            </column>
+            <column name="photo" type="bytea">
+                <constraints unique="true" nullable="true"/>
+            </column>
+        </createTable>
+
+    </changeSet>
+
+</databaseChangeLog>

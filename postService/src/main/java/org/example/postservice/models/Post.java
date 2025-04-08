@@ -1,17 +1,22 @@
 package org.example.postservice.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.google.cloud.firestore.annotation.DocumentId;
+import com.google.cloud.spring.data.firestore.Document;
+import lombok.*;
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+
+@Document
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Post {
+    @DocumentId
     private String postID;
 
     private String imageUrl;
-
     private String coordinates;
-
     private String description;
+
+    @Builder.Default
+    private Integer likes = 0;
+
+    private String uid;
 }

@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.rmi.server.UID;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/post")
 @CrossOrigin("*")
@@ -25,18 +28,20 @@ public class PostController {
     public ResponseEntity<?> putPhoto(@RequestParam("UID") String uid,
                                       @ModelAttribute RequestPost requestPost) {
         try {
+            Post post = new Post();
+
             String fileName = requestPost.file().getOriginalFilename();
 
             String key = "posts/" + uid + "/" + fileName;
 
             var putPhoto = s3Service.PutObject(key, requestPost.file());
 
-            Post post = new Post(
-                    String.valueOf((int)(Math.random() * 900000)),
-                    putPhoto,
-                    requestPost.coordinates(),
-                    requestPost.description()
-            );
+
+            post.setUid(uid);
+            post.setImageUrl(putPhoto);
+            post.setCoordinates(requestPost.coordinates());
+            post.setUid(UUID.randomUUID().toString());
+            post.setDescription(requestPost.description());
 
             postRepo.addPost(uid, post);
 

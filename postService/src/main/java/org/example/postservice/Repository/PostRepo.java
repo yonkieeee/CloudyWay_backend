@@ -3,21 +3,21 @@ package org.example.postservice.Repository;
 import org.example.postservice.models.Post;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
-import org.example.postservice.models.UserPosts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Repository
 public class PostRepo {
+
     private final CollectionReference postsCollection;
+
+    @Autowired
+    private Firestore firestore;
 
     @Autowired
     public PostRepo(Firestore firestore) {
@@ -25,59 +25,39 @@ public class PostRepo {
     }
 
     public void addPost(String uid, Post post) throws ExecutionException, InterruptedException {
-        DocumentReference docRef = postsCollection.document(uid);
-        ApiFuture<DocumentSnapshot> future = docRef.get();
-        DocumentSnapshot document = future.get();
+        CollectionReference postsRef = firestore.collection("users").document(uid).collection("posts");
 
-        UserPosts userPosts;
-        if (document.exists()) {
-            userPosts = document.toObject(UserPosts.class);
-
-            assert userPosts != null;
-            if (userPosts.getPosts() == null) {
-                userPosts.setPosts(new ArrayList<>());
-            }
-        } else {
-            userPosts = new UserPosts();
-            userPosts.setId(uid);
-            userPosts.setPosts(new ArrayList<>());
+        if(post.getPostID() == null || post.getPostID().isEmpty()) {
+            post.setPostID(postsRef.document().getId());
         }
-
-        userPosts.addPost(post);
-
-        ApiFuture<WriteResult> writeFuture = docRef.set(userPosts);
-        writeFuture.get();
+        post.setUid(uid);
+        postsRef.document(post.getPostID()).set(post).get();
     }
 
-    public List<Post> getPosts(String uid) throws ExecutionException, InterruptedException {
-        DocumentReference docRef = postsCollection.document(uid);
-        ApiFuture<DocumentSnapshot> future = docRef.get();
-        DocumentSnapshot document = future.get();
+    public Optional<List<Post>> getPosts(String uid) throws ExecutionException, InterruptedException {
+        CollectionReference postsRef = firestore.collection("users").document(uid).collection("posts");
+        ApiFuture<QuerySnapshot> query = postsRef.get();
 
-        if (document.exists()) {
-            UserPosts userPosts = document.toObject(UserPosts.class);
-            if (userPosts != null) {
-                return userPosts.getPosts();
-            }
+        List<QueryDocumentSnapshot> documents = query.get().getDocuments();
+        List<Post> posts = new ArrayList<>();
+
+        for(QueryDocumentSnapshot document : documents) {
+            Post post = document.toObject(Post.class);
         }
-        return null;
+
+        return Optional.of(posts);
     }
 
-    public List<Post> getPost(String uid, String postId) throws ExecutionException, InterruptedException {
-        DocumentReference docRef = postsCollection.document(uid);
-        ApiFuture<DocumentSnapshot> future = docRef.get();
-        DocumentSnapshot document = future.get();
+    public Optional<Post> getPost(String uid, String postId) throws ExecutionException, InterruptedException {
+        DocumentReference docRef = firestore.collection("users").document(uid).collection("posts").document(postId);
+        DocumentSnapshot snapshot = docRef.get().get();
 
-        if (!document.exists())
-            return Collections.emptyList();
+        return Optional.ofNullable(snapshot.toObject(Post.class));
+    }
 
-        UserPosts userPosts = document.toObject(UserPosts.class);
+    public void deletePost(String uid, String postId) throws ExecutionException, InterruptedException {
+        DocumentReference docRef = firestore.collection("users").document(uid).collection("posts").document(postId);
 
-        if (userPosts == null || userPosts.getPosts() == null)
-            return Collections.emptyList();
-
-        return userPosts.getPosts().stream()
-                .filter(post -> Objects.equals(post.getPostID(), postId))
-                .collect(Collectors.toList());
+        docRef.delete().get();
     }
 }
